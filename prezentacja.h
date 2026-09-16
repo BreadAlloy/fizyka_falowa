@@ -5,7 +5,7 @@ bool pokaz_x = true;
 bool pokaz_y = false;
 bool pokaz_z = false;
 
-void pokaz_1d_wzgledem_czasu(const obiekt& pokazywany, std::string nazwa = "obiekt") {
+void pokaz_1d_wzgledem_czasu_pozycje(const obiekt& pokazywany, std::string nazwa = "obiekt") {
 
 	if (pokaz_x) ImPlot::PlotLine((nazwa + " x").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].x), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
 	if (pokaz_y) ImPlot::PlotLine((nazwa + " y").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].y), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
@@ -15,6 +15,19 @@ void pokaz_1d_wzgledem_czasu(const obiekt& pokazywany, std::string nazwa = "obie
 		if (pokaz_x) ImPlot::PlotScatter((nazwa + " x").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].x), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
 		if (pokaz_y) ImPlot::PlotScatter((nazwa + " y").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].y), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
 		if (pokaz_z) ImPlot::PlotScatter((nazwa + " z").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].z), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+	}
+}
+
+void pokaz_1d_wzgledem_czasu_predkosci(const obiekt& pokazywany, std::string nazwa = "obiekt") {
+
+	if (pokaz_x) ImPlot::PlotLine((nazwa + " x").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.x), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+	if (pokaz_y) ImPlot::PlotLine((nazwa + " y").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.y), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+	if (pokaz_z) ImPlot::PlotLine((nazwa + " z").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.z), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+
+	if (pokaz_punkty) {
+		if (pokaz_x) ImPlot::PlotScatter((nazwa + " x").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.x), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+		if (pokaz_y) ImPlot::PlotScatter((nazwa + " y").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.y), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
+		if (pokaz_z) ImPlot::PlotScatter((nazwa + " z").c_str(), &(pokazywany.przebyta_trasa[0].t), &(pokazywany.przebyta_trasa[0].v.z), pokazywany.przebyta_trasa.size(), 0, 0, sizeof(punkt_historyczny));
 	}
 }
 
@@ -192,23 +205,39 @@ struct pokaz_interaktywny{
 
 		if(odswiez_widok_przestrzeni) policz_jak_widzi_przestrzen();
 
-		if (ImPlot::BeginPlot("Wykresy", ImVec2(2000.0f, 400.0f))) {
+		if (ImPlot::BeginPlot("Wykresy pozycji", ImVec2(2000.0f, 350.0f))) {
 
 			ImPlot::SetupAxes("czas", "pozycja");
 
-			pokaz_1d_wzgledem_czasu(obiekt1, "Trasa obiekt 1");
-			pokaz_1d_wzgledem_czasu(obiekt2, "Trasa obiekt 2");
+			pokaz_1d_wzgledem_czasu_pozycje(obiekt1, "Trasa obiekt 1");
+			pokaz_1d_wzgledem_czasu_pozycje(obiekt2, "Trasa obiekt 2");
 
-			pokaz_1d_wzgledem_czasu(obserwowany1, "Obserwator statyczny obiekt 1");
-			pokaz_1d_wzgledem_czasu(obserwowany2, "Obserwator statyczny obiekt 2");
+			pokaz_1d_wzgledem_czasu_pozycje(obserwowany1, "Obserwator statyczny obiekt 1");
+			pokaz_1d_wzgledem_czasu_pozycje(obserwowany2, "Obserwator statyczny obiekt 2");
 
-			pokaz_1d_wzgledem_czasu(_2patrzyna1, "obiekt 2 patrzy na 1");
-			pokaz_1d_wzgledem_czasu(_1patrzyna2, "obiekt 1 patrzy na 2");
+			pokaz_1d_wzgledem_czasu_pozycje(_2patrzyna1, "obiekt 2 patrzy na 1");
+			pokaz_1d_wzgledem_czasu_pozycje(_1patrzyna2, "obiekt 1 patrzy na 2");
 
 			ImPlot::EndPlot();
 		}
 
-		if (ImPlot::BeginPlot("Wykresy pola", ImVec2(2000.0f, 400.0f))) {
+		if (ImPlot::BeginPlot("Wykresy predkosci", ImVec2(2000.0f, 350.0f))) {
+
+			ImPlot::SetupAxes("czas", "predkosc");
+
+			pokaz_1d_wzgledem_czasu_predkosci(obiekt1, "Predkosci obiekt 1");
+			pokaz_1d_wzgledem_czasu_predkosci(obiekt2, "Predkosci obiekt 2");
+
+			pokaz_1d_wzgledem_czasu_predkosci(obserwowany1, "Obserwator statyczny obiekt 1");
+			pokaz_1d_wzgledem_czasu_predkosci(obserwowany2, "Obserwator statyczny obiekt 2");
+
+			pokaz_1d_wzgledem_czasu_predkosci(_2patrzyna1, "obiekt 2 patrzy na 1");
+			pokaz_1d_wzgledem_czasu_predkosci(_1patrzyna2, "obiekt 1 patrzy na 2");
+
+			ImPlot::EndPlot();
+		}
+
+		if (ImPlot::BeginPlot("Wykresy pola", ImVec2(2000.0f, 350.0f))) {
 
 			ImPlot::SetupAxes("pozycja", "wartosc");
 

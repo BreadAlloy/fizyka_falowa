@@ -45,17 +45,21 @@ typedef punkt_przestrzeni vec_sily;
 
 struct punkt_historyczny : punkt_przestrzeni{
 	punkt_czasu t = FP_ZERO;
+	vec_predkosci v;
 
-	static friend vec_predkosci predkosc(const punkt_historyczny P1, const punkt_historyczny P2){
-		ASSERT_Z_ERROR_MSG(P2.t > P1.t, "P2 powinien byc pozniej niz P1\n");
+	void zapisz_predkosc(const punkt_historyczny& poprzedni){
+		const punkt_historyczny& biezacy = *this;
+		ASSERT_Z_ERROR_MSG(biezacy.t > poprzedni.t, "biezacy powinien byc pozniej niz poprzedni\n");
 
-		fp_t dt = P2.t - P1.t;
-		return (P2 - P1)/dt;
+		fp_t dt = biezacy.t - poprzedni.t;
+		v = (biezacy - poprzedni) / dt;
 	}
 };
 
+typedef std::vector<punkt_historyczny> trasa;
+
 struct obiekt{
-	std::vector<punkt_historyczny> przebyta_trasa;
+	trasa przebyta_trasa;
 
 	punkt_historyczny gdzie_byl(punkt_czasu t, bool* czy_poprawny = nullptr) const {
 		if(t < gdzie_zaczol().t){ //zapytanie o nieznana przeszlosc
@@ -143,7 +147,7 @@ struct obiekt{
 	}
 
 	vec_predkosci predkosc_teraz() const {
-		return predkosc(gdzie_byl_przed_chwila(), gdzie_jest());
+		return gdzie_jest().v;
 	}
 
 	bool czy_istnieje(){
@@ -153,9 +157,13 @@ struct obiekt{
 	void nastepna_lokalizacja(const punkt_historyczny P) {
 		if(czy_istnieje()){
 			ASSERT_Z_ERROR_MSG(P.t > gdzie_jest().t, "Nie tak dziala czas\n");
-			ASSERT_Z_ERROR_MSG((predkosc(gdzie_jest(), P).norma() <= c), "Szybsze niz swiatlo?\n");
 		}
 		przebyta_trasa.push_back(P);
+		if(przebyta_trasa.size() != 1){
+			przebyta_trasa.back().zapisz_predkosc(gdzie_byl_przed_chwila());
+		}
+
+		ASSERT_Z_ERROR_MSG((predkosc_teraz().norma() <= c), "Szybsze niz swiatlo?\n");
 	}
 	
 	void wyczysc(){
